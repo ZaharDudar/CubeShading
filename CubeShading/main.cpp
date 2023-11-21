@@ -108,7 +108,7 @@ int main()
 
     sf::Vertex* point = new sf::Vertex(sf::Vector2f(680 / 2, 480 / 2), sf::Color::Blue);
 
-    char path[] = "C:/Users/z2016/Desktop/twoSperes.obj";
+    char path[] = "C:/Users/z2016/Desktop/tor.obj";
     inputObj CubeFromObj(path, sf::Vector2f(680 / 2, 480 / 2));
 
     Cube cube;

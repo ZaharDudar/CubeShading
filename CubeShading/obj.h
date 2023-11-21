@@ -11,12 +11,13 @@ using namespace std;
 using sf::Vector2f;
 using sf::Vector3f;
 
-
 struct face
 {
 	vector<Vector3f> points;
 	Vector3f normal;
+	Vector3f center;
 };
+
 
 vector<string> split(string a, char delimeter) {
 	string tmp;
@@ -57,7 +58,9 @@ struct light
 		color = ic;
 	}
 };
-
+bool comp(face a, face b) {
+	return a.center.z > b.center.z;
+}
 class obj
 {
 public:
@@ -90,6 +93,7 @@ public:
 	virtual void rotate(float a, float b, float c){}
 
 };
+
 
 class Cube : public obj
 {
@@ -177,6 +181,7 @@ public:
 					tmp_face.points.push_back(vertexes[std::stoi(indexes[0])-1]);
 				}
 				tmp_face.normal = normals[std::stoi(indexes[2])-1];
+				tmp_face.center = avarage(tmp_face.points);
 				faces.push_back(tmp_face);
 			}
 		}
@@ -203,4 +208,5 @@ void inputObj::rotate(float a, float b, float c) {
 		}
 		faces[faceId].normal = rotateVect(faces[faceId].normal, a, b, c);
 	}
+	std::sort(faces.begin(), faces.end(), comp);
 }
