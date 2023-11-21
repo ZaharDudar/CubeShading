@@ -80,7 +80,7 @@ void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls) {
             FaceColor.g = g;
             FaceColor.b = b;
         }
-        cout << max_color<< " " << FaceColor.r << " " << FaceColor.g << " " << FaceColor.b << '\n';
+        //cout << max_color<< " " << FaceColor.r << " " << FaceColor.g << " " << FaceColor.b << '\n';
 
         faceDraw.setFillColor(FaceColor);
         faceDraw.setOutlineColor(sf::Color(0, 100, 190));
@@ -96,7 +96,7 @@ void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls) {
 
 
 
-int main()
+int main(int argc, char* argv[])
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
@@ -107,12 +107,16 @@ int main()
     sf::Vector3f viewDir(0.0f, 0.0f, 1.0f);
 
     sf::Vertex* point = new sf::Vertex(sf::Vector2f(680 / 2, 480 / 2), sf::Color::Blue);
+    obj* cube=nullptr;
+    if (argc == 2) {
+    //char path[] = "C:/Users/z2016/Desktop/tor.obj";
+     cube = new inputObj(argv[1], sf::Vector2f(680 / 2, 480 / 2));
+    }
+    else {
+        cube = new Cube();
+        cube->offset = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    }
 
-    char path[] = "C:/Users/z2016/Desktop/tor.obj";
-    inputObj CubeFromObj(path, sf::Vector2f(680 / 2, 480 / 2));
-
-    Cube cube;
-    cube.offset = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Vector3f rot_angles(0,0,0);
 
     vector<light> lights;
@@ -184,10 +188,10 @@ int main()
         //rot_angles = rot_angles * ROT_SPEED;
         //sunlight= rotateVect(sunlight, 0, 0, 0.0005);
         //window.draw(shape);
-        CubeFromObj.rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
+        cube->rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
 
         start = get_time();
-        drawFrame(&window, CubeFromObj, lights);
+        drawFrame(&window, *cube, lights);
         end = get_time();
         window.display();
     }
