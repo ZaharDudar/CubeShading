@@ -21,12 +21,18 @@ int mymax(int a, int b, int c) {
     if (tmp_max < c) tmp_max = c;
     return tmp_max;
 }
+template<typename T>
+T mymax(T a, T b) {
+    T tmp_max = a;
+    if (tmp_max < b) tmp_max = b;
+    return tmp_max;
+}
 double get_time()
 {
     return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() / 1e6;
 }
 
-void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls) {
+void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls, Vector3f viewDir) {
     float shade=0;
 
 
@@ -51,26 +57,53 @@ void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls) {
         }
         /*_________________Вся магия__________________*/
 
-        //cout << dot(object.faces[face].normal, sunlight) << "\n";
         sf::Color FaceColor;
         float dot_calc = 0;
         int r = 0, g = 0, b = 0;
         for (int light_i = 0; light_i < ls.size(); light_i++) {
-            dot_calc = dot(object.faces[face].normal, ls[light_i].dir);
-            if (dot_calc<0) {
-                shade = -dot_calc;
+            if (ls[light_i].type == GLOBAL_LIGHT) {
+                dot_calc = dot(object.faces[face].normal, ls[light_i].dir);
+                if (dot_calc < 0) {
+                    shade = -dot_calc;
+                }
+                else
+                {
+                    shade = 0;
+                }
+                r += shade * ls[light_i].color.r;
+                g += shade * ls[light_i].color.g;
+                b += shade * ls[light_i].color.b;
             }
-            else
-            {
-                shade = 0;
+            if (ls[light_i].type == POINT_LIGHT) {
+                Vector3f to_light_dir = -ls[light_i].pos + object.faces[face].center + Vector3f(object.offset.x, object.offset.y, 0);
+                normalize(&to_light_dir);
+                dot_calc = dot(object.faces[face].normal, to_light_dir);
+                if (dot_calc<0) {
+                    shade = -dot_calc;
+                }
+                else
+                {
+                    shade = 0;
+                }
+                float spec_mult =dot(norm(refclected(-to_light_dir, object.faces[face].normal)),viewDir);
+                if (spec_mult < -0.85) {
+                    spec_mult = 1-(1+spec_mult)/0.15;
+                }
+                else
+                {
+                    spec_mult = 0;
+                }
+                r += shade * object.self_material.Kd.x * ls[light_i].color.r + spec_mult * object.self_material.Ks.x * ls[light_i].color.r * object.self_material.Ns;
+                g += shade * object.self_material.Kd.y * ls[light_i].color.g + spec_mult * object.self_material.Ks.y * ls[light_i].color.g * object.self_material.Ns;
+                b += shade * object.self_material.Kd.z * ls[light_i].color.b + spec_mult * object.self_material.Ks.z * ls[light_i].color.b * object.self_material.Ns;
+                //r += spec_mult * ls[light_i].color.r;
+                //g += 0 * ls[light_i].color.g;
+                //b += 0 * ls[light_i].color.b;
             }
-            r += shade * ls[light_i].color.r;
-            g += shade * ls[light_i].color.g;
-            b += shade * ls[light_i].color.b;
             //cout << FaceColor.r << " | "<<  (int)ls[light_i].color.r <<" !";
         }
         int max_color = mymax(r,g,b);
-        if (max_color != 0 and max_color > 255) {
+        if (max_color > 255) {
             FaceColor.r = (float)r / (float)max_color * 255;
             FaceColor.g = (float)g / (float)max_color * 255;
             FaceColor.b = (float)b / (float)max_color * 255;
@@ -80,13 +113,14 @@ void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls) {
             FaceColor.g = g;
             FaceColor.b = b;
         }
-        cout << max_color<< " " << FaceColor.r << " " << FaceColor.g << " " << FaceColor.b << '\n';
+        //cout << max_color<< " " << FaceColor.r << " " << FaceColor.g << " " << FaceColor.b << '\n';
 
         faceDraw.setFillColor(FaceColor);
         faceDraw.setOutlineColor(sf::Color(0, 100, 190));
         //faceDraw.setOutlineThickness(1);
-        if(dot(object.faces[face].normal, Vector3f(0,0,1))<0)
+        if (dot(object.faces[face].normal, Vector3f(0, 0, 1)) < 0)
             (*rw).draw(faceDraw);
+
     }
 
 }
@@ -108,7 +142,7 @@ int main()
 
     sf::Vertex* point = new sf::Vertex(sf::Vector2f(680 / 2, 480 / 2), sf::Color::Blue);
 
-    char path[] = "C:/Users/z2016/Desktop/twoSperes.obj";
+    char path[] = "C:/Users/z2016/Desktop/tor.obj";
     inputObj CubeFromObj(path, sf::Vector2f(680 / 2, 480 / 2));
 
     Cube cube;
@@ -117,9 +151,10 @@ int main()
 
     vector<light> lights;
     //lights.push_back(light(1, 1, 1, sf::Color(255, 255, 255)));
-    lights.push_back(light(-1, 0, 0, sf::Color(255, 0, 0)));
-    lights.push_back(light(1, 0, 0, sf::Color(0, 0, 255)));
-
+    //lights.push_back(GlobalLight(Vector3f( - 1, 0, 0), sf::Color(255, 0, 0)));
+    //lights.push_back(GlobalLight(Vector3f(1, 0, 0), sf::Color(0, 0, 255)));
+    lights.push_back(PointLight(Vector3f(0, 0, -200), 100, sf::Color(255, 255, 255)));
+    lights.push_back(PointLight(Vector3f(680, 0,0), 100, sf::Color(0, 100, 255)));
     double start=1, end=0;
     while (window.isOpen())
     {
@@ -187,7 +222,7 @@ int main()
         CubeFromObj.rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
 
         start = get_time();
-        drawFrame(&window, CubeFromObj, lights);
+        drawFrame(&window, CubeFromObj, lights,viewDir);
         end = get_time();
         window.display();
     }
