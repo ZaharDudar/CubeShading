@@ -130,7 +130,7 @@ void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls, Vector3f viewD
 
 
 
-int main()
+int main(int argc, char* argv[])
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
@@ -142,11 +142,14 @@ int main()
 
     sf::Vertex* point = new sf::Vertex(sf::Vector2f(680 / 2, 480 / 2), sf::Color::Blue);
 
-    char path[] = "C:/Users/z2016/Desktop/tor.obj";
-    inputObj CubeFromObj(path, sf::Vector2f(680 / 2, 480 / 2));
-
-    Cube cube;
-    cube.offset = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    obj* cube = nullptr;
+    if (argc == 2) {
+        cube = new inputObj(argv[1], sf::Vector2f(680 / 2, 480 / 2));
+    }
+    else {
+        cube = new Cube();
+        cube->offset = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    }
     Vector3f rot_angles(0,0,0);
 
     vector<light> lights;
@@ -219,10 +222,10 @@ int main()
         //rot_angles = rot_angles * ROT_SPEED;
         //sunlight= rotateVect(sunlight, 0, 0, 0.0005);
         //window.draw(shape);
-        CubeFromObj.rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
+        cube->rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
 
         start = get_time();
-        drawFrame(&window, CubeFromObj, lights,viewDir);
+        drawFrame(&window, *cube, lights,viewDir);
         end = get_time();
         window.display();
     }

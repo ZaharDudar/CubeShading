@@ -227,6 +227,7 @@ public:
 		std::ifstream file(fileName);
 		string raw_line;
 		vector<string> line;
+		if (file.fail()) { cout << "ERROR OPENING FILE"; exit(1); }
 		while (std::getline(file, raw_line)) {
 			line = split(raw_line, ' ');
 			if (line[0] == "v") {
