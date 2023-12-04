@@ -13,7 +13,7 @@ using std::cout;
 #define SCREEN_WIDTH 680
 #define SCREEN_HEIGHT 480
 
-#define ROT_SPEED 3.0f;
+#define ROT_SPEED 4.0f;
 
 int mymax(int a, int b, int c) {
     int tmp_max = a;
@@ -132,6 +132,7 @@ void drawFrame(sf::RenderWindow *rw,obj object, vector<light> ls, Vector3f viewD
 
 int main(int argc, char* argv[])
 {
+    float speed_multipier = 1;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Cube makes rot rot",7U,settings);
@@ -170,22 +171,25 @@ int main(int argc, char* argv[])
                 switch (event.key.scancode)
                 {
                 case sf::Keyboard::W:
-                    rot_angles.x = -ROT_SPEED;
-                    break;
-                case sf::Keyboard::S:
                     rot_angles.x = ROT_SPEED;
                     break;
-                case sf::Keyboard::A:
-                    rot_angles.y = ROT_SPEED;
+                case sf::Keyboard::S:
+                    rot_angles.x = -ROT_SPEED;
                     break;
-                case sf::Keyboard::D:
+                case sf::Keyboard::A:
                     rot_angles.y = -ROT_SPEED;
                     break;
+                case sf::Keyboard::D:
+                    rot_angles.y = ROT_SPEED;
+                    break;
                 case sf::Keyboard::Q:
-                    rot_angles.z = -ROT_SPEED;
+                    rot_angles.z = ROT_SPEED;
                     break;
                 case sf::Keyboard::E:
-                    rot_angles.z = ROT_SPEED;
+                    rot_angles.z = -ROT_SPEED;
+                    break;
+                case sf::Keyboard::Scancode::LShift:
+                    speed_multipier = 2;
                     break;
                 default:
                     break;
@@ -212,14 +216,18 @@ int main(int argc, char* argv[])
                 case sf::Keyboard::E:
                     rot_angles.z = 0;
                     break;
+                case sf::Keyboard::Scancode::LShift:
+                    speed_multipier = 1;
+                    break;
                 default:
                     break;
                 }
+                
             }
         }
         window.clear();
         normalize(&rot_angles);
-        //rot_angles = rot_angles * ROT_SPEED;
+        rot_angles = rot_angles * speed_multipier * ROT_SPEED;
         //sunlight= rotateVect(sunlight, 0, 0, 0.0005);
         //window.draw(shape);
         cube->rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));

@@ -119,6 +119,7 @@ struct PointLight : light
 bool comp(face a, face b) {
 	return a.center.z > b.center.z;
 }
+
 class obj
 {
 public:
@@ -299,6 +300,7 @@ void inputObj::rotate(float a, float b, float c) {
 			faces[faceId].points[vert] = rotateVect(faces[faceId].points[vert], a, b, c);
 		}
 		faces[faceId].normal = rotateVect(faces[faceId].normal, a, b, c);
+		faces[faceId].center = rotateVect(faces[faceId].center, a, b, c);
 	}
 	std::sort(faces.begin(), faces.end(), comp);
 }
