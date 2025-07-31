@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+#include "SFML/Graphics.hpp"
 #include "obj.hpp"
 #include <vector>
 #include <SFML/System/Vector2.hpp>
@@ -13,7 +13,7 @@ using std::cout;
 #define SCREEN_WIDTH 680
 #define SCREEN_HEIGHT 480
 
-#define ROT_SPEED 10.0f;
+#define ROT_SPEED 3.0f;
 
 int mymax(int a, int b, int c) {
     int tmp_max = a;
@@ -132,29 +132,29 @@ int main(int argc, char* argv[])
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
-                window.close();
+            window.close();
             if (event.type == sf::Event::KeyPressed) {
                 switch (event.key.scancode)
                 {
-                case sf::Keyboard::W:
+                    case sf::Keyboard::W:
                     rot_angles.x = -ROT_SPEED;
                     break;
-                case sf::Keyboard::S:
+                    case sf::Keyboard::S:
                     rot_angles.x = ROT_SPEED;
                     break;
-                case sf::Keyboard::A:
+                    case sf::Keyboard::A:
                     rot_angles.y = ROT_SPEED;
                     break;
-                case sf::Keyboard::D:
+                    case sf::Keyboard::D:
                     rot_angles.y = -ROT_SPEED;
                     break;
-                case sf::Keyboard::Q:
+                    case sf::Keyboard::Q:
                     rot_angles.z = ROT_SPEED;
                     break;
-                case sf::Keyboard::E:
+                    case sf::Keyboard::E:
                     rot_angles.z = -ROT_SPEED;
                     break;
-                default:
+                    default:
                     break;
                 }
             }
@@ -162,40 +162,39 @@ int main(int argc, char* argv[])
                 switch (event.key.scancode)
                 {
                 case sf::Keyboard::W:
-                    rot_angles.x = 0;
-                    break;
+                rot_angles.x = 0;
+                break;
                 case sf::Keyboard::S:
-                    rot_angles.x = 0;
-                    break;
+                rot_angles.x = 0;
+                break;
                 case sf::Keyboard::A:
-                    rot_angles.y = 0;
-                    break;
+                rot_angles.y = 0;
+                break;
                 case sf::Keyboard::D:
-                    rot_angles.y = 0;
-                    break;
+                rot_angles.y = 0;
+                break;
                 case sf::Keyboard::Q:
-                    rot_angles.z = 0;
-                    break;
+                rot_angles.z = 0;
+                break;
                 case sf::Keyboard::E:
-                    rot_angles.z = 0;
-                    break;
+                rot_angles.z = 0;
+                break;
                 default:
-                    break;
-                }
+                break;
             }
         }
-        window.clear();
-        normalize(&rot_angles);
-        // rot_angles = rot_angles * ROT_SPEED;
-        //sunlight= rotateVect(sunlight, 0, 0, 0.0005);
-        //window.draw(shape);
-        cube->rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
-
-        start = get_time();
-        drawFrame(&window, *cube, lights);
-        end = get_time();
-        window.display();
     }
+    window.clear();
+    normalize(&rot_angles);
+    rot_angles = rot_angles * ROT_SPEED;
+    //sunlight= rotateVect(sunlight, 0, 0, 0.0005);
+    //window.draw(shape);
+    start = get_time();
+    cube->rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
+    end = get_time();
+    drawFrame(&window, *cube, lights);
+    window.display();
+}
 
-    return 0;
+return 0;
 }
