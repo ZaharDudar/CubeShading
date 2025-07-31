@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
-#include "obj.h"
-#include <Vector>
+#include "obj.hpp"
+#include <vector>
 #include <SFML/System/Vector2.hpp>
 #include <math.h>
 #include <iostream>
-#include "vectFunctions.h"
+#include "vectFunctions.hpp"
 #include <string>
 #include <chrono>
 
@@ -13,7 +13,7 @@ using std::cout;
 #define SCREEN_WIDTH 680
 #define SCREEN_HEIGHT 480
 
-#define ROT_SPEED 3.0f;
+#define ROT_SPEED 10.0f;
 
 int mymax(int a, int b, int c) {
     int tmp_max = a;
@@ -109,10 +109,11 @@ int main(int argc, char* argv[])
     sf::Vertex* point = new sf::Vertex(sf::Vector2f(680 / 2, 480 / 2), sf::Color::Blue);
     obj* cube=nullptr;
     if (argc == 2) {
-    //char path[] = "C:/Users/z2016/Desktop/tor.obj";
-     cube = new inputObj(argv[1], sf::Vector2f(680 / 2, 480 / 2));
+    // char path[] = "C:/Users/z2016/Desktop/tor.obj";
+        cube = new inputObj(argv[1], sf::Vector2f(680 / 2, 480 / 2));
     }
     else {
+        // char path[] = "/home/zahar/Рабочий стол/fish.obj";
         cube = new Cube();
         cube->offset = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     }
@@ -120,9 +121,9 @@ int main(int argc, char* argv[])
     Vector3f rot_angles(0,0,0);
 
     vector<light> lights;
-    //lights.push_back(light(1, 1, 1, sf::Color(255, 255, 255)));
+    lights.push_back(light(1, 1, 1, sf::Color(255, 255, 255)));
     lights.push_back(light(-1, 0, 0, sf::Color(255, 0, 0)));
-    lights.push_back(light(1, 0, 0, sf::Color(0, 0, 255)));
+    lights.push_back(light(1, 1, 0, sf::Color(0, 0, 255)));
 
     double start=1, end=0;
     while (window.isOpen())
@@ -148,10 +149,10 @@ int main(int argc, char* argv[])
                     rot_angles.y = -ROT_SPEED;
                     break;
                 case sf::Keyboard::Q:
-                    rot_angles.z = -ROT_SPEED;
+                    rot_angles.z = ROT_SPEED;
                     break;
                 case sf::Keyboard::E:
-                    rot_angles.z = ROT_SPEED;
+                    rot_angles.z = -ROT_SPEED;
                     break;
                 default:
                     break;
@@ -185,7 +186,7 @@ int main(int argc, char* argv[])
         }
         window.clear();
         normalize(&rot_angles);
-        //rot_angles = rot_angles * ROT_SPEED;
+        // rot_angles = rot_angles * ROT_SPEED;
         //sunlight= rotateVect(sunlight, 0, 0, 0.0005);
         //window.draw(shape);
         cube->rotate(rot_angles.x*(start-end), rot_angles.y * (start - end), rot_angles.z * (start - end));
